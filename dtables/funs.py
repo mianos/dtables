@@ -1,7 +1,7 @@
 from flask import request
 
 
-def vhandler(query, metadata, dtable):  # Add sqlalchemy filters here ... , **filters):
+def vhandler(query, metadata, dtable): 
     # initialise the reply with the draw item from the request as datatables wants it back
     reply = dict(draw=int(request.args['draw']), data=[])
     columns = list()
