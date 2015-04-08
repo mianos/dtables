@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_styles %}
+    <link href="{{'dataTables.bootstrap.css'|find_resource}}" rel="stylesheet">
+    <link href="{{'dataTables.responsive.css'|find_resource}}" rel="stylesheet">
+{% endblock page_styles %}
+
+{% block page_scripts %}
+   <script src="{{'jquery.dataTables.js'|find_resource}}"></script>
+   <script src="{{'dataTables.bootstrap.js'|find_resource}}"></script>
+   <script src="{{'dtables.js'|find_resource}}"></script>
+   <script src="{{'dataTables.responsive.js'|find_resource}}"></script>
+{% endblock page_scripts %}
+

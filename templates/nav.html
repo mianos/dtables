@@ -1,0 +1,48 @@
+<nav class="navbar navbar-default" role="navigation">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">ASMetrics Captive Portal</a>
+  </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      {% if True %} {# current_user.is_authenticated() %} #}
+      <ul class="nav navbar-nav">
+      {% for col_menu, row_items in menu.items() %}
+        <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ col_menu }} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          {% for row_text, route in row_items.items() %}
+            <li><a href="{{route}}">{{row_text}}</a></li>
+          {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+    {#    <ul class="nav navbar-nav navbar-right"> #}
+     <ul class="nav navbar-nav navbar-right margin: 10px 0 0 20px">
+     {#
+     {% if current_user.is_authenticated() %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ current_user.id }} 
+          {% if current_user.is_super %}
+          <b>[S]</b>
+          {% endif %}<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+             <li><a href="profile">Profile</a></li>
+             <li><a href={{ url_for('auth.logout') }}>Logout</a></li>
+          </ul>
+        </li>
+     {% else %}
+        <li><a href={{ url_for('auth.login') }}>Admin Login</a></li>
+    {% endif %} #}
+     </ul>
+  </div><!-- /.navbar-collapse -->
+</nav>
