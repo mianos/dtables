@@ -1,7 +1,4 @@
 *.pyc
 *.swp
 settings.ini
-static/*
-!static/js/ChilliLibrary.js
-!static/favicon.ico
 ve

@@ -4,7 +4,7 @@ import inspect
 class DTColumn(object):
     creation_counter = 0
 
-    def __init__(self, title='', **kwargs):
+    def __init__(self, title=None, **kwargs):
         self.creation_order = DTColumn.creation_counter
         DTColumn.creation_counter += 1
         self.title = title
@@ -13,6 +13,7 @@ class DTColumn(object):
     def __getattr__(self, entry):
         return self.options.get(entry, None)
 
+
 class ListingMeta(type):
     def __new__(meta, classname, bases, classDict):
         cls = type.__new__(meta, classname, bases, classDict)
@@ -20,6 +21,33 @@ class ListingMeta(type):
         cls.nb_columns = len(cls.columns)
         return cls
 
+jsstr = repr
+
+class DTableColumnHandlers:
+    def title(colname, col):
+        if col.title:
+            title = col.title
+        else:
+            if '__' in colname:
+                title = colname.split('__')[1].replace('_', ' ')
+            else:
+                title = colname.replace('_', ' ')
+        return jsstr(title)
+
+    def name(colname, col):
+        return jsstr(colname)
+
+    def mData(colname, col):
+        return jsstr(colname)
+
+    def mRender(colname, col):
+        return col.render(colname, col) if col.render else None
+
+    def orderable(colname, col):
+        return jsstr('true') if col.sortable is None else jsstr('false')
+
+    def hidden(colname, col):
+        return jsstr('false') if col.hidden else None
 
 # classmethods because we don't ever instantiate a live instance of the class. Good/bad?
 class DTable(object):
@@ -31,23 +59,28 @@ class DTable(object):
 
     @classmethod
     def dt_columns(self):
-        dblock = "[\n"
+        rowlist = list()
         for colname, col in self.columns:
-            dblock += '{ title: "%s", ' % col.title
-            dblock += 'name: "%s", ' % colname
-            # if not col.calculated:
-            dblock += 'mData: "%s", ' % colname
-            if col.render:
-                dblock += 'mRender: %s, ' % col.render
-            if col.sortable == None:
-                dblock += 'orderable: true, '
-            else:
-                dblock += 'orderable: false, '
-            if col.hidden:
-                dblock += '"visible": false, '
-            dblock += '},\n'
-        dblock += "]"
-        return dblock
+
+            column_list = list()
+            for name, method in DTableColumnHandlers.__dict__.iteritems():
+                if not callable(method):
+                    continue
+                value = method(colname, col)
+                if value:
+                    column_list.append("\t%s: %s" % (name, value))
+            rowlist.append('{' + ",\n".join(column_list) + '}')
+        return  '[' + ',\n'.join(rowlist) + ']'
+
+    @classmethod
+    def dt_fixed_columns(self):
+        for ii, (cr, aa) in enumerate(self.columns):
+            if not aa.hidden and not aa.fixed:
+                break
+        if ii < len(self.columns):
+            return ii
+        else:
+            return 0
 
     @classmethod
     def dt_order_info(self):
@@ -65,7 +98,8 @@ class DTable(object):
                 rdata = col.mapper(value) if col.mapper else value
             except Exception as ee:
                 print "col name", colname, "not in ", item, "error", str(ee)
-                from IPython import embed; embed()
+                continue
+                # from IPython import embed; embed()
 
             ff[colname] = rdata if rdata is not None else ''
         return ff
@@ -73,7 +107,6 @@ class DTable(object):
     @classmethod
     def dt_item_id(self, item):
         return item.id
-
 
 
 if __name__ == '__main__':

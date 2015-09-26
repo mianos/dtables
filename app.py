@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
-import time
-from flask import Flask, redirect, url_for, g
+from flask import Flask, redirect, url_for, g, Blueprint, flash
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -9,6 +8,22 @@ import configobj
 import jinja_local.jinja_filters
 
 import reports
+import menu
+
+# some stubs because flask_login is not used. Delete these and add flask login
+auth = Blueprint('auth', __name__)
+
+
+@auth.route('/login')
+def login():
+    flash('login ROFL')
+    return redirect(url_for('reports.users_list'))
+
+
+@auth.route('/logout')
+def logout():
+    flash('logout ROFL')
+    return redirect(url_for('reports.users_list'))
 
 
 def create_app():
@@ -21,12 +36,14 @@ def create_app():
     engine = create_engine(app.settings['database']['connection'], echo=True, pool_recycle=3600)
     Session = sessionmaker(bind=engine)  # autocommit=True)
 
+    menu.init_app(app)
     jinja_local.jinja_filters.init_app(app)
     app.register_blueprint(reports.reports, url_prefix='/reports')
+    app.register_blueprint(auth)
 
     @app.route('/')
     def root():
-        return redirect(url_for('reports.usagedt'))
+        return redirect(url_for('reports.users_list'))
 
     @app.after_request
     def session_commit(response):
@@ -38,8 +55,6 @@ def create_app():
     @app.before_request
     def before_request():
         g.session = Session()
-
-
 
     @app.teardown_request
     def teardown_request(exception):

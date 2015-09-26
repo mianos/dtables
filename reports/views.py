@@ -1,12 +1,12 @@
 import datetime
 import json
 import decimal
-from flask import Blueprint, render_template, request, g, Response
+from flask import Blueprint, render_template, request, g, Response, url_for
 
 from sqlalchemy import func
 
 from sql_errors import catch_sql_errors
-from schema import Radacct, metadata
+from schema import User, metadata
 from menu import add_menu
 from dtables.dtorm import DTable, DTColumn
 from dtables.funs import vhandler
@@ -27,50 +27,30 @@ render_decimal = """function (data, type, full, meta) {
                    }"""
 
 
-class UsageDTable(DTable):
-    radacct__radacctid = DTColumn('id', hidden=True, sortable=False)
-    radacct__username = DTColumn('User Name')
-    radacct__total = DTColumn('Total', render=render_decimal)
-    radacct__acctsessiontime = DTColumn('Time', sort_column=[1, 'desc'])
-    radacct__acctstarttime = DTColumn('Start')
+class UsersDTable(DTable):
+    es_users__id = DTColumn('id', hidden=True, sortable=False)
+    es_users__email = DTColumn()
+    es_users__first_name = DTColumn()
+    es_users__last_name = DTColumn()
 
     @classmethod
     def dt_item_id(self, item):
-        return str(item.radacct__radacctid)
+        return str(item.es_users__id)
 
 
-@reports.route('/usagedt_data/')
-def usagedt_data():
-    qry = None
-    if 'sParams' in request.args:
-        params = dict(ii.split('=') for ii in request.args['sParams'].split('|'))
-    else:
-        params = dict()
-    if 'agg' in params and params['agg'] == 'sum':
-        qry = g.session.query(
-            func.min(Radacct.acctstarttime).label('radacct__acctstarttime'),
-            func.sum(Radacct.acctinputoctets + Radacct.acctoutputoctets).label('radacct__total'),
-            func.sum(Radacct.acctsessiontime).label('radacct__acctsessiontime'))\
-                        .group_by(Radacct.username, Radacct.callingstationid)
-    else:
-        qry = g.session.query((Radacct.acctinputoctets + Radacct.acctoutputoctets).label('radacct__total'))
+@reports.route('/usagedt_data')
+def list_data():
+    qry = g.session.query(User)
 
-    if 'period' in params:
-        days = int(params['period'])
-    else:
-        days = 30
-    qry = qry.filter(Radacct.acctstarttime >
-                datetime.datetime.now() -
-                datetime.timedelta(days=days))
-    results = vhandler(qry, metadata, dtable=UsageDTable)
+    results = vhandler(qry, metadata.tables, dtable=UsersDTable)
     return Response(json.dumps(results, default=sg), mimetype='application/json')
 
 
-@add_menu('Reports', 'Usage DT', 'usagedt', reports)
-@add_menu('Reports', 'Usage DT Sum', 'usagedt?filter=agg=sum', reports)
-@add_menu('Reports', 'Usage DT for 10 days', 'usagedt?filter=agg=sum|period=10', reports)
-@reports.route('/usagedt')
+@add_menu('Users', 'List', 'users_list', reports)
+@reports.route('/users_list')
 @catch_sql_errors('login')
-def usagedt():
-    filter = request.args.get('filter', None)
-    return render_template('usagedt.html', dtable=UsageDTable, filter=filter)
+def users_list():
+    return render_template('generic_report.html',
+                           dtable=UsersDTable,
+                           get_data=url_for('reports.list_data', what=None),
+                           title='Users')

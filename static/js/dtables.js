@@ -11,46 +11,27 @@ function get_id(me) {
     }
 }
 
-$.fn.asmetDataTable = function(ajaxUrl, columns, order, server_params) {
-  // TODO: how to properly pass this up?
+$.fn.asmetDataTable = function(ajaxUrl, columns, options) {
+    options = options || {};
     asmetDataTable  = this.dataTable({
-//    responsive: {
-//          details: {
-//            type: 'inline',
-//            renderer: function ( api, rowIdx ) {
- //             var theRow = api.row(rowIdx);
-  //            console.log("row: ", theRow.data());
-//              //console.log("cache: ", theRow.cache('search'));
-//                    // Select hidden columns for the given row
-//                    var data = api.cells( rowIdx, ':hidden' ).eq(0).map( function ( cell ) {
-//                        var header = $( api.column( cell.column ).header() );
-//     
-//                        return '<tr>'+ '<td>'+ header.text()+'</td>' + '<td>&nbsp;</td>' + '<td>'+  $( api.cell( cell ).node() ).html() + '</td>'+ '</tr>';
-//                    } ).toArray().join('');
-//     
-//                    return data ?
-//                        $('<table/>').append( data ) :
-//                        false;
- //               }
- //         }
- //   },
+    sScrollX: true,
     bFilter: false,
     processing: true,
     serverSide: true,
     sAjaxSource: ajaxUrl,
     columns: columns,
-    order: order || [0, 'asc'],
+    displayLength: 30,
+    order: options.order || [0, 'asc'],
     fnServerParams:  function ( aoData ) {
-        aoData.push({ "name": "sParams", "value": server_params});
+        if ('filter' in options) {
+            aoData.push({ "name": "sParams", "value": options.filter});
+        }
     },
-    /* TODO: come back and work out how to highlight odd rows
-    "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        if (aData.selectable) {
-            console.log("row" + nRow.id + "selectable");
-            $(nRow).css('background-color', 'grey').css('cursor', 'pointer');
-            $(nRow).addClass('dt-hover');
-      }
-    }, */
+    fnRowCallback: function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        if ('row_callback' in options) {
+            options.row_callback(nRow, aData);
+        }
+    }, 
 
 
     fnServerData: function (url, aoData, callback, settings) {
@@ -123,4 +104,10 @@ $.fn.asmetDataTable = function(ajaxUrl, columns, order, server_params) {
            $("#searchbox").val('');
            asmetDataTable.fnFilter('');
     });
+    if ('fixed_columns' in options) {
+         new $.fn.dataTable.FixedColumns(asmetDataTable, {
+            leftColumns: options.fixed_columns
+        });
+    }
+    return asmetDataTable;
 }

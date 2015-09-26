@@ -1,28 +1,30 @@
 from flask import request
 
 
-def vhandler(query, metadata, dtable): 
+def vhandler(query, all_tables, dtable, manual_map=False):
     # initialise the reply with the draw item from the request as datatables wants it back
     reply = dict(draw=int(request.args['draw']), data=[])
-    columns = list()
-    column_names = list()
-    for col in dtable.dt_data_columns():
-        if '__' in col:
-            table, column = col.split('__')
-            if column not in metadata.tables[table].columns:
-                print "Column missing, check metadata.tables[table].columns"
+    if manual_map is not True:
+        columns = list()
+        column_names = list()
+        for col in dtable.dt_data_columns():
+            if '__' in col:
+                table, column = col.split('__')
+                if column not in all_tables[table].columns:
+                    print "Column missing, check metadata.tables[table].columns"
+                    continue
+                columns.append(all_tables[table].columns[column])
+                column_names.append(col)
+            else:
+                # no table name, underlying expression column or something else aliased
+                # so don't add the column and assume the developer puts it somewhere in the query
                 continue
-            columns.append(metadata.tables[table].columns[column])
-            column_names.append(col)
-        else:
-            print "table def not supportedf for column", col
-            return
 
-    existing_query_columns = set(ii['name'] for ii in query.column_descriptions)
-    for col, name in zip(columns, column_names):
-        if name in existing_query_columns:
-            continue
-        query = query.add_columns(col.label(name))
+        existing_query_columns = set(ii['name'] for ii in query.column_descriptions)
+        for col, name in zip(columns, column_names):
+            if name in existing_query_columns:
+                continue
+            query = query.add_columns(col.label(name))
 
     sortCol = request.args.get('sortCol', None)
     if sortCol:
