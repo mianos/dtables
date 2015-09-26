@@ -3,8 +3,6 @@ import json
 import decimal
 from flask import Blueprint, render_template, request, g, Response, url_for
 
-from sqlalchemy import func
-
 from sql_errors import catch_sql_errors
 from schema import User, metadata
 from menu import add_menu

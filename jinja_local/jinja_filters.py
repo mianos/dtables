@@ -1,8 +1,7 @@
 from flask import current_app
-import urlparse
 from menu import global_menu
-from flask import url_for
 from cdns import cdns
+
 
 def init_app(app):
     @app.template_filter('astime')
@@ -21,7 +20,6 @@ def init_app(app):
             s = s[:-3]
         return s + ','.join(reversed(groups))
 
-
     @app.template_filter('find_resource')
     def find_resource(ss, version=None):
         if ss not in cdns:
@@ -31,4 +29,3 @@ def init_app(app):
         return url
 
     app.jinja_env.globals['menu'] = global_menu
-

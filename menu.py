@@ -8,6 +8,7 @@ global_menu = OrderedDefaultdict(OrderedDefaultdict)
 
 no_flask_login = True
 
+
 def init_app(app):
     @app.template_global('issubmenu')
     def issubmenu(value):
@@ -17,6 +18,7 @@ def init_app(app):
         class fake_user(object):
             id = 1
             is_super = True
+
             @staticmethod
             def is_authenticated():
                 return True

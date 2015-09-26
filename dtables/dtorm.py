@@ -23,6 +23,7 @@ class ListingMeta(type):
 
 jsstr = repr
 
+
 class DTableColumnHandlers:
     def title(colname, col):
         if col.title:
@@ -49,6 +50,7 @@ class DTableColumnHandlers:
     def hidden(colname, col):
         return jsstr('false') if col.hidden else None
 
+
 # classmethods because we don't ever instantiate a live instance of the class. Good/bad?
 class DTable(object):
     __metaclass__ = ListingMeta
@@ -61,7 +63,6 @@ class DTable(object):
     def dt_columns(self):
         rowlist = list()
         for colname, col in self.columns:
-
             column_list = list()
             for name, method in DTableColumnHandlers.__dict__.iteritems():
                 if not callable(method):
@@ -70,7 +71,7 @@ class DTable(object):
                 if value:
                     column_list.append("\t%s: %s" % (name, value))
             rowlist.append('{' + ",\n".join(column_list) + '}')
-        return  '[' + ',\n'.join(rowlist) + ']'
+        return '[' + ',\n'.join(rowlist) + ']'
 
     @classmethod
     def dt_fixed_columns(self):
