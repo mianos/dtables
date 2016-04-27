@@ -34,6 +34,13 @@ def vhandler(query, all_tables, dtable, manual_map=False):
             query = query.order_by(col.expression.desc())
         else:
             query = query.order_by(col.expression)
+    else:
+        for cname, dtcol in dtable.columns:
+            if 'hidden' not in dtcol.options:
+                query = query.order_by(next(dd['expr'] for dd in query.column_descriptions if dd['name'] == cname))
+                break
+            else:
+                print cname, "is hidden"
 
     reply['recordsTotal'] = query.count()
     reply['recordsFiltered'] = reply['recordsTotal']

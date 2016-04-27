@@ -45,10 +45,10 @@ class DTableColumnHandlers:
         return col.render(colname, col) if col.render else None
 
     def orderable(colname, col):
-        return jsstr('true') if col.sortable is None else jsstr('false')
+        return 'true' if col.sortable is None else 'false'
 
-    def hidden(colname, col):
-        return jsstr('false') if col.hidden else None
+    def bVisible(colname, col):
+        return 'false' if col.hidden else None
 
 
 # classmethods because we don't ever instantiate a live instance of the class. Good/bad?
