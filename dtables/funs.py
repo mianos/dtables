@@ -37,7 +37,11 @@ def vhandler(query, all_tables, dtable, manual_map=False):
     else:
         for cname, dtcol in dtable.columns:
             if 'hidden' not in dtcol.options:
-                query = query.order_by(next(dd['expr'] for dd in query.column_descriptions if dd['name'] == cname))
+                col = next(dd['expr'] for dd in query.column_descriptions if dd['name'] == cname)
+                if request.args.get('sortDir', 'asc') == 'desc':
+                    query = query.order_by(col.desc())
+                else:
+                    query = query.order_by(col.asc())
                 break
             else:
                 print cname, "is hidden"
