@@ -99,6 +99,7 @@ class DTable(object):
                 rdata = col.mapper(value) if col.mapper else value
             except Exception as ee:
                 print "col name", colname, "not in ", item, "error", str(ee)
+                print "reverse"; from IPython import embed; embed()  # noqa
                 continue
                 # from IPython import embed; embed()
 
