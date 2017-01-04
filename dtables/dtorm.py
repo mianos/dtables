@@ -63,10 +63,10 @@ class DTable(object):
     def dt_columns(self):
         rowlist = list()
         for colname, col in self.columns:
+            column_list = list()
             if 'raw_column' in col.options:
                 rowlist.append(col.options['raw_column'])
             else:
-                column_list = list()
                 for name, method in DTableColumnHandlers.__dict__.iteritems():
                     if not callable(method):
                         continue
@@ -102,6 +102,7 @@ class DTable(object):
                 rdata = col.mapper(value) if col.mapper else value
             except Exception as ee:
                 print "col name", colname, "not in ", item, "error", str(ee)
+                rdata = 'N/A'
                 continue
                 # from IPython import embed; embed()
 

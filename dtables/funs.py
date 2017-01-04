@@ -49,8 +49,16 @@ def vhandler(query, all_tables, dtable, manual_map=False):
     reply['recordsTotal'] = query.count()
     reply['recordsFiltered'] = reply['recordsTotal']
 
-    items = query.offset(int(request.args['start'])) \
-                 .limit(int(request.args['length']))
+    items = query.offset(int(request.args['start']))
+
+    if 'length' in request.args:
+        try:
+            ll = int(request.args['length'])
+            if ll > 0:
+                items = items.limit(ll)
+        except ValueError:
+            pass
+        
 
     item_data = list()
     for item in items:
