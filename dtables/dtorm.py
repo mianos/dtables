@@ -63,14 +63,17 @@ class DTable(object):
     def dt_columns(self):
         rowlist = list()
         for colname, col in self.columns:
-            column_list = list()
-            for name, method in DTableColumnHandlers.__dict__.iteritems():
-                if not callable(method):
-                    continue
-                value = method(colname, col)
-                if value:
-                    column_list.append("\t%s: %s" % (name, value))
-            rowlist.append('{' + ",\n".join(column_list) + '}')
+            if 'raw_column' in col.options:
+                rowlist.append(col.options['raw_column'])
+            else:
+                column_list = list()
+                for name, method in DTableColumnHandlers.__dict__.iteritems():
+                    if not callable(method):
+                        continue
+                    value = method(colname, col)
+                    if value:
+                        column_list.append("\t%s: %s" % (name, value))
+                rowlist.append('{' + ",\n".join(column_list) + '}')
         return '[' + ',\n'.join(rowlist) + ']'
 
     @classmethod
