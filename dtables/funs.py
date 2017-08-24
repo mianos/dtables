@@ -1,7 +1,10 @@
+import logging
 from flask import request
 
 
-def vhandler(query, all_tables, dtable, manual_map=False):
+logger = logging.getLogger(__name__)
+
+def vhandler(query, all_tables, dtable, manual_map=False, count=None):
     # initialise the reply with the draw item from the request as datatables wants it back
     reply = dict(draw=int(request.args['draw']), data=[])
     if manual_map is not True:
@@ -11,7 +14,7 @@ def vhandler(query, all_tables, dtable, manual_map=False):
             if '__' in col:
                 table, column = col.split('__')
                 if column not in all_tables[table].columns:
-                    print "Column missing, check metadata.tables[table].columns"
+                    logger.error("Column missing, check metadata.tables[table].columns")
                     continue
                 columns.append(all_tables[table].columns[column])
                 column_names.append(col)
@@ -37,16 +40,20 @@ def vhandler(query, all_tables, dtable, manual_map=False):
     else:
         for cname, dtcol in dtable.columns:
             if 'hidden' not in dtcol.options:
-                col = next(dd['expr'] for dd in query.column_descriptions if dd['name'] == cname)
+                for dd in query.column_descriptions:
+                    if dd['name'] == cname:
+                        col = dd['expr']
+                        break
+                else:
+                    logger.error("Column %s 'missing' - class fields are of the form <table>__<field> where __ is a double underscore" % cname)
+                    continue
                 if request.args.get('sortDir', 'asc') == 'desc':
                     query = query.order_by(col.desc())
                 else:
                     query = query.order_by(col.asc())
                 break
-            else:
-                print cname, "is hidden"
 
-    reply['recordsTotal'] = query.count()
+    reply['recordsTotal'] = count if count else query.count()
     reply['recordsFiltered'] = reply['recordsTotal']
 
     items = query.offset(int(request.args['start']))
