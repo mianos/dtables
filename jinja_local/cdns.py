@@ -1,8 +1,8 @@
 import flask
 import os
 import sys
-import urlparse
-import urllib2
+from urllib.parse import urlparse
+import urllib.request as urllib2
 import argparse
 
 from flask import url_for
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         elif url[0] == '/':
             return "file:/" + url, 'file'
         else:
-            print "unknown scheme on", url
+            print("unknown scheme on", url)
             sys.exit(1)
     agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0'
     opener = urllib2.build_opener()
@@ -93,12 +93,12 @@ if __name__ == '__main__':
                 try:
                     response = opener.open(qo)
                 except Exception as e:
-                    print "error", e, "on ", file_key, "as", url, "tried", qo
+                    print("error", e, "on ", file_key, "as", url, "tried", qo)
                 else:
-                    print "OK found", file_key
+                    print("OK found", file_key)
                 if args.file:
                     path = os.path.join(args.file, cdns[file_key].subdir, file_key)
-                    print "Write to '%s'" % path
+                    print("Write to '%s'" % path)
                     ff = open(path, 'w')
                     ff.write(response.read())
                     ff.close()
@@ -106,6 +106,6 @@ if __name__ == '__main__':
                 uparsed = urlparse.urlparse(qo)
                 fpath = uparsed.netloc + uparsed.path
                 if not os.path.isfile(fpath):
-                    print "error", file_key, "as", url, "tried", fpath
+                    print("error", file_key, "as", url, "tried", fpath)
                 else:
-                    print "OK found file", file_key
+                    print("OK found file", file_key)

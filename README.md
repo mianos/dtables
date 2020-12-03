@@ -1,4 +1,6 @@
+
 # dtables
+
 SQLA Python to jquery datatables.
 
 See the SyPy presentation on this module: https://docs.google.com/presentation/d/1gFzJGU_prBZ-PaXOPQPiJaUNzJPlfKFBHUlTJJlWzTk/edit?usp=sharing
@@ -18,3 +20,6 @@ connection=mysql://rfo:verysecret@localhost/mydatabase
 
 Then make a virtualenv and install requirements.txt
 The run app.py
+
+## License
+This project is licensed under the terms of the MIT license.

@@ -1,1 +1,1 @@
-from views import reports
+from reports.views import reports

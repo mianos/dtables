@@ -35,7 +35,7 @@ def add_menu(row_text, col_text, route, blueprint=None, submenu=None):
     if submenu:
         if row_text in global_menu and col_text in global_menu[row_text]:
             if not isinstance(global_menu[row_text][col_text], OrderedDefaultdict):
-                print "not ordered dict, not adding"
+                print("not ordered dict, not adding")
             else:
                 global_menu[row_text][col_text][submenu] = route
         else:

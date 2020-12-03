@@ -1,6 +1,6 @@
 from flask import current_app
 from menu import global_menu
-from cdns import cdns
+from jinja_local.cdns import cdns
 
 
 def init_app(app):
@@ -23,7 +23,6 @@ def init_app(app):
     @app.template_filter('find_resource')
     def find_resource(ss, version=None):
         if ss not in cdns:
-            print "jinja template find_resource failed on", ss
             return "jinja template find_resource failed on", ss
         url = cdns[ss].url(ss, use_static=current_app.config.get('STATIC_RESOURCES', False), version=version)
         return url

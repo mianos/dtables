@@ -101,7 +101,7 @@ class DTable(object):
                 value = item[colname]
                 rdata = col.mapper(value) if col.mapper else value
             except Exception as ee:
-                print "col name", colname, "not in ", item, "error", str(ee)
+                print("col name", colname, "not in ", item, "error", str(ee))
                 rdata = 'N/A'
                 continue
                 # from IPython import embed; embed()
