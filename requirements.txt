@@ -1,6 +1,6 @@
 configobj==5.0.6
 configparser==5.0.1
-Flask==1.1.2
+Flask==2.3.2
 Flask-WTF==0.14.3
 mysqlclient==2.0.1
 SQLAlchemy==1.3.20
